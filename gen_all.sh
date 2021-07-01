@@ -166,52 +166,6 @@ cp ${BITSTREAM} ${CURR_BUILD_DIR}/assets/${TRGT_CORE}/${KERNEL}_wrapper.bit
 cp ${PRJDIR}/${KERNEL}_wrapper.tcl ${CURR_BUILD_DIR}/assets/${TRGT_CORE}/
 cp ${PRJDIR}/${VIVADO_PRJNAME}.srcs/sources_1/bd/${KERNEL}/hw_handoff/${KERNEL}.hwh ${CURR_BUILD_DIR}/assets/${TRGT_CORE}/${KERNEL}_wrapper.hwh
 
-########build 3
-echo ""
-echo "***************************************"
-echo "[GEM] Build the Grandient MI kernel"
-echo ""
-echo "***************************************"
-
-TRGT_CORE=mutual_information_gradient
-mkdir -p ${CURR_BUILD_DIR}/${TRGT_CORE}
-PRJDIR=${CURR_BUILD_DIR}/${TRGT_CORE}/${VIVADO_PRJNAME}
-SRC_DIR=${TOP}/metrics/${TRGT_CORE}
-HLS_CODE=($(ls ${SRC_DIR}/mutual_information_derived.cpp))
-HLS_CODE+=($(ls ${SRC_DIR}/*.h))
-HLS_CODE+=($(ls ${SRC_DIR}/*.hpp))
-HLS_CODE_STRING="${HLS_CODE[@]}"
-IP_REPO=${CURR_BUILD_DIR}/${TRGT_CORE}/${HLS_PRJNAME}/solution1/impl/ip
-
-echo "${HLS_CODE[@]}"
-echo "$HLS_CODE_STRING"
-
-CORE_NAME=mutual_information_derived_master
-BITSTREAM=${PRJDIR}/${VIVADO_PRJNAME}.runs/impl_1/${KERNEL}_wrapper.bit
-
-#HLS
-echo ""
-echo "***************************************"
-echo "[GEM-Info] Starting HLS for Grandient MI kernel"
-echo ""
-echo "***************************************"
-cd ${CURR_BUILD_DIR}/${TRGT_CORE}
-vivado_hls -f ${SCRIPT_DIR}/hls.tcl -tclargs ${HLS_PRJNAME} "${HLS_CODE_STRING}" ${BRD_PARTS} ${HLS_CLK} ${CORE_NAME} "${SRC_DIR}/";
-cd ../
-
-#vivado
-echo ""
-echo "***************************************"
-echo "[GEM-Info] Starting Vivado for Grandient MI kernel"
-echo ""
-echo "***************************************"
-vivado -mode batch -source ${VVD_SCRIPT} -tclargs ${TOP} ${VIVADO_PRJNAME} ${PRJDIR} ${IP_REPO} ${FREQ_MHZ} 1 ${CORE_NAME} ${KERNEL} 1
-vivado -mode batch -source ${VVD_SYNTH_SCRIPT} -tclargs ${PRJDIR}/${VIVADO_PRJNAME}.xpr ${PRJDIR} ${VIVADO_PRJNAME} ${KERNEL}_wrapper
-mkdir -p ${CURR_BUILD_DIR}/assets/${TRGT_CORE}
-cp ${BITSTREAM} ${CURR_BUILD_DIR}/assets/${TRGT_CORE}/${KERNEL}_wrapper.bit
-cp ${PRJDIR}/${KERNEL}_wrapper.tcl ${CURR_BUILD_DIR}/assets/${TRGT_CORE}/
-cp ${PRJDIR}/${VIVADO_PRJNAME}.srcs/sources_1/bd/${KERNEL}/hw_handoff/${KERNEL}.hwh ${CURR_BUILD_DIR}/assets/${TRGT_CORE}/${KERNEL}_wrapper.hwh
-
 echo ""
 echo "***************************************"
 echo "[GEM] GEM is at the end, bye"
